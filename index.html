@@ -88,64 +88,203 @@ const decisions = {
   start: {
     question: "What's your primary goal?",
     options: [
-      ["Quick information or simple task", "rtf"],
-      ["Creating content", "costar"],
-      ["Complex reasoning or strategy", "tot"],
-      ["Teaching or explaining", "feynman"],
-      ["Verifying accuracy", "consistency"]
+      ["Quick information or a well-defined task", "rtf"],
+      ["Creating content where voice and audience matter", "costar"],
+      ["Complex reasoning, strategy, or decision-making", "tot"],
+      ["Teaching, learning, or explaining ideas clearly", "feynman"],
+      ["Verifying correctness or reducing hallucinations", "consistency"]
     ]
   },
 
   rtf: {
     framework: "RTF",
     title: "Role · Task · Format",
-    description: "Minimalist framework for fast, clear requests.",
-    when: ["Clear tasks", "Fast iteration", "Low ambiguity"],
-    avoid: ["Complex analysis", "High-stakes decisions"],
-    structure: "Role → Task → Format",
-    example: "Role: Email writer\nTask: Follow-up email\nFormat: 4 sentences, friendly"
+    description: `
+RTF is a precision framework designed to minimize ambiguity while keeping prompts short.
+It works by constraining the model's perspective (Role), defining exactly what it should do (Task),
+and eliminating guesswork about output shape (Format).
+
+RTF is ideal when you already know what you want and speed matters more than exploration.
+`,
+    when: [
+      "Tasks with clear success criteria",
+      "Operational or repeatable work",
+      "High-volume prompting workflows",
+      "Situations where brevity improves consistency"
+    ],
+    avoid: [
+      "Ill-defined or exploratory problems",
+      "Strategic or creative ideation",
+      "Situations requiring back-and-forth refinement"
+    ],
+    structure: `
+Role: Specify the expertise or viewpoint the model should adopt
+Task: Define the exact action to perform
+Format: Constrain length, structure, or style of the output
+`,
+    example: `
+Role: Senior B2B SaaS copywriter
+Task: Write a follow-up email to a prospect who attended a demo but hasn’t replied
+Format: 5 sentences, professional but friendly tone, end with a single clear CTA
+`
   },
 
   costar: {
     framework: "COSTAR",
     title: "Context · Objective · Style · Tone · Audience · Response",
-    description: "Best when voice and audience matter.",
-    when: ["Marketing", "Brand content"],
-    avoid: ["Data analysis"],
-    structure: "Context → Objective → Style → Tone → Audience → Response",
-    example: "Context: Wellness app\nAudience: Therapists\nTone: Trustworthy"
+    description: `
+COSTAR is a high-fidelity content framework optimized for situations where nuance, voice,
+and audience alignment matter. It reduces misalignment by making implicit expectations explicit.
+
+This framework shines in marketing, branding, public communication, and any scenario
+where “how it sounds” is as important as “what it says.”
+`,
+    when: [
+      "Marketing or brand-sensitive content",
+      "Public-facing communication",
+      "Audience-specific messaging",
+      "Situations where tone mistakes are costly"
+    ],
+    avoid: [
+      "Internal analysis or reasoning tasks",
+      "Purely factual lookups",
+      "Data-heavy or technical problem-solving"
+    ],
+    structure: `
+Context: Background, constraints, and situation
+Objective: What success looks like
+Style: Reference examples or writing conventions
+Tone: Emotional quality (e.g., confident, empathetic)
+Audience: Who the content is for
+Response: Desired format and length
+`,
+    example: `
+Context: A mindfulness app competing with Headspace
+Objective: Convince therapists to recommend the app to clients
+Style: NYTimes health section
+Tone: Credible, respectful, non-salesy
+Audience: Licensed therapists (LCSW, 30–60)
+Response: One-page persuasive overview with bullet sections
+`
   },
 
   tot: {
     framework: "Tree of Thoughts",
-    title: "Multi-path reasoning",
-    description: "Explore multiple solution paths before choosing.",
-    when: ["Strategy", "Complex decisions"],
-    avoid: ["Simple queries"],
-    structure: "Generate paths → Evaluate → Select",
-    example: "Option A / B / C → Compare → Choose best"
+    title: "Multi-path reasoning and evaluation",
+    description: `
+Tree of Thoughts (ToT) is designed for complex problems where a single linear chain
+of reasoning is insufficient. Instead of committing early, the model explores multiple
+distinct approaches, evaluates them, and then deepens the strongest path.
+
+This framework is especially useful for strategy, architecture decisions, and
+high-stakes trade-off analysis.
+`,
+    when: [
+      "Strategic decision-making",
+      "Problems with multiple viable solutions",
+      "Situations with unclear best path forward",
+      "High-impact or irreversible decisions"
+    ],
+    avoid: [
+      "Simple or well-scoped tasks",
+      "Time-constrained scenarios",
+      "Situations where exploration adds little value"
+    ],
+    structure: `
+1. Generate multiple distinct approaches
+2. Evaluate each against explicit criteria
+3. Select the strongest option
+4. Continue reasoning in depth on the chosen path
+`,
+    example: `
+Problem: Reduce cloud infrastructure costs by 30%
+
+Generate three approaches:
+A) Optimize existing architecture
+B) Migrate services to cheaper providers
+C) Redesign system boundaries
+
+Evaluate each on cost reduction, risk, timeline, and engineering effort.
+Select the best option and provide a detailed execution plan.
+`
   },
 
   feynman: {
     framework: "Feynman Technique",
-    title: "Teach it simply",
-    description: "Explain concepts in beginner-friendly language.",
-    when: ["Teaching", "Learning"],
-    avoid: ["Expert documentation"],
-    structure: "Explain like to a 12-year-old",
-    example: "Explain blockchain using everyday analogies"
+    title: "Explain by simplifying",
+    description: `
+The Feynman Technique forces clarity by requiring explanations that a beginner
+could understand. If an explanation cannot be made simple, it usually means
+the underlying understanding is incomplete.
+
+This framework is powerful for teaching, learning, and testing comprehension.
+`,
+    when: [
+      "Teaching complex concepts",
+      "Learning unfamiliar domains",
+      "Identifying gaps in understanding",
+      "Creating educational content"
+    ],
+    avoid: [
+      "Expert-to-expert communication",
+      "Highly technical documentation",
+      "Situations where precision matters more than intuition"
+    ],
+    structure: `
+1. Explain the concept as if to a beginner
+2. Avoid jargon or define it clearly
+3. Use analogies and concrete examples
+4. Build from first principles
+`,
+    example: `
+Explain how large language models work as if you were teaching a curious 12-year-old.
+Use everyday analogies, avoid technical jargon, and explain each idea before moving on.
+`
   },
 
   consistency: {
     framework: "Self-Consistency",
-    title: "Accuracy via repetition",
-    description: "Ask multiple times and compare answers.",
-    when: ["Math", "Facts"],
-    avoid: ["Creative writing"],
-    structure: "Repeat → Compare → Consensus",
-    example: "Run calculation 5 times, compare results"
+    title: "Accuracy through repetition",
+    description: `
+Self-Consistency improves reliability by leveraging variation. By generating multiple
+independent answers to the same prompt and comparing them, you can identify consensus,
+surface uncertainty, and reduce hallucinations.
+
+This approach trades cost and speed for higher confidence.
+`,
+    when: [
+      "Factual accuracy is critical",
+      "Math or logical reasoning tasks",
+      "Classification or extraction tasks",
+      "Situations where errors are costly"
+    ],
+    avoid: [
+      "Creative writing",
+      "Opinion-based tasks",
+      "Cost- or latency-sensitive workflows"
+    ],
+    structure: `
+1. Ask the same question multiple times independently
+2. Compare the results
+3. Identify consensus and divergence
+4. Flag uncertainty or investigate disagreements
+`,
+    example: `
+Answer the following question 5 times independently:
+"What is the CAGR given X, Y, and Z?"
+
+Then:
+- Identify the most common answer
+- Explain any discrepancies
+- State confidence level in the final result
+`
   }
 };
+
+let history = [];
+let current = "start";
+</script>
+
 
 let history = [];
 let current = "start";
