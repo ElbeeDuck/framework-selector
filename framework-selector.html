@@ -191,203 +191,6 @@ const decisions = {
       + "Steps: Segment → Correlate → Diagnose → Prioritize\n"
       + "End Goal: Exec-ready recommendations\n"
       + "Narrowing: Enterprise customers only"
-  },
-
-  costar: {
-    framework: "COSTAR",
-    title: "Context · Objective · Style · Tone · Audience · Response",
-    description:
-      "COSTAR is optimized for content where voice, tone, and audience alignment matter. "
-      + "It dramatically reduces misalignment in marketing and public-facing communication.",
-
-    when: [
-      "Marketing or brand content",
-      "Audience-specific messaging",
-      "Public communication"
-    ],
-
-    avoid: [
-      "Internal analysis",
-      "Data-heavy tasks"
-    ],
-
-    structure:
-      "Context → Objective → Style → Tone → Audience → Response",
-
-    example:
-      "Context: Mental health app competing with Headspace\n"
-      + "Objective: Get therapists to recommend it\n"
-      + "Style: NYT Health\n"
-      + "Tone: Trustworthy\n"
-      + "Audience: LCSWs\n"
-      + "Response: One-page overview"
-  },
-
-  tot: {
-    framework: "Tree of Thoughts",
-    title: "Multi-Path Reasoning",
-    description:
-      "Tree of Thoughts explores multiple solution paths before committing, making it ideal for strategic decisions "
-      + "where early commitment is risky.",
-
-    when: [
-      "Strategic decisions",
-      "Multiple viable solutions",
-      "High-impact choices"
-    ],
-
-    avoid: [
-      "Simple execution tasks",
-      "Time-critical queries"
-    ],
-
-    structure:
-      "Generate approaches → Evaluate → Select → Deepen",
-
-    example:
-      "Problem: Reduce cloud costs by 30%\n"
-      + "A: Optimize architecture\n"
-      + "B: Migrate services\n"
-      + "C: Redesign boundaries\n"
-      + "Evaluate on cost, risk, timeline, then expand best option"
-  },
-
-  consistency: {
-    framework: "Self-Consistency",
-    title: "Accuracy via Repetition",
-    description:
-      "Self-Consistency improves reliability by generating multiple independent answers "
-      + "and identifying consensus and uncertainty.",
-
-    when: [
-      "Math or factual accuracy",
-      "High cost of error"
-    ],
-
-    avoid: [
-      "Creative tasks",
-      "Opinion-based work"
-    ],
-
-    structure:
-      "Repeat → Compare → Consensus → Investigate divergence",
-
-    example:
-      "Answer this question 5 times independently, then identify the consensus and explain discrepancies."
-  },
-
-  cot: {
-    framework: "Chain of Thought",
-    title: "Step-by-Step Reasoning",
-    description:
-      "Chain of Thought makes reasoning explicit, improving correctness on complex logic problems.",
-
-    when: [
-      "Math and logic problems",
-      "Transparency required"
-    ],
-
-    avoid: [
-      "Simple facts",
-      "Creative writing"
-    ],
-
-    structure:
-      "Think step-by-step before answering",
-
-    example:
-      "Think step-by-step:\n"
-      + "1. Identify variables\n"
-      + "2. Apply formula\n"
-      + "3. Verify result"
-  },
-
-  feynman: {
-    framework: "Feynman Technique",
-    title: "Explain by Simplifying",
-    description:
-      "The Feynman Technique enforces true understanding by requiring explanations "
-      + "that a beginner can follow.",
-
-    when: [
-      "Teaching",
-      "Learning new domains"
-    ],
-
-    avoid: [
-      "Expert documentation"
-    ],
-
-    structure:
-      "Explain simply → Avoid jargon → Use analogies",
-
-    example:
-      "Explain transformers as if teaching a curious 12-year-old."
-  },
-
-  socratic: {
-    framework: "Socratic Method",
-    title: "Learn Through Questions",
-    description:
-      "The Socratic method teaches by guiding learners with questions instead of giving answers.",
-
-    when: [
-      "Teaching reasoning",
-      "Developing understanding"
-    ],
-
-    avoid: [
-      "Need quick answers"
-    ],
-
-    structure:
-      "Ask guiding questions instead of answering",
-
-    example:
-      "Don’t answer directly. Ask questions that help me discover the answer myself."
-  },
-
-  scamper: {
-    framework: "SCAMPER",
-    title: "Structured Ideation",
-    description:
-      "SCAMPER systematically generates ideas by applying seven creative lenses.",
-
-    when: [
-      "Product ideation",
-      "Creative blocks"
-    ],
-
-    avoid: [
-      "Execution tasks"
-    ],
-
-    structure:
-      "Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse",
-
-    example:
-      "Apply SCAMPER to redesign a coffee mug."
-  },
-
-  decomposition: {
-    framework: "Problem Decomposition",
-    title: "Break Problems Down",
-    description:
-      "Decomposition reduces overwhelm by splitting large problems into manageable sub-problems.",
-
-    when: [
-      "Large ambiguous problems"
-    ],
-
-    avoid: [
-      "Simple tasks"
-    ],
-
-    structure:
-      "Identify sub-problems → dependencies → priorities",
-
-    example:
-      "Break launching a SaaS into validation, tech, marketing, funding."
   }
 };
 
@@ -438,14 +241,19 @@ function render() {
 
         <div class="flex justify-between mt-6">
           ${path.length ? `<button onclick="back()" class="text-white">← Back</button>` : `<span></span>`}
-          <button onclick="reset()" class="bg-purple-600 px-4 py-2 rounded text-white">Start Over</button>
+          <div class="flex gap-2">
+            <button onclick="reset()" class="bg-purple-600 px-4 py-2 rounded text-white">Start Over</button>
+            <a href="framework-selector.html" 
+               class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+               Further Prompting Framework Help →
+            </a>
+          </div>
         </div>
       </div>
     </div>
   `;
 }
 
-function choose(next means next) {}
 function choose(next) {
   path.push(currentStep);
   currentStep = next;
@@ -453,8 +261,10 @@ function choose(next) {
 }
 
 function back() {
-  currentStep = path.pop();
-  render();
+  if (path.length) {
+    currentStep = path.pop();
+    render();
+  }
 }
 
 function reset() {
