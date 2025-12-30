@@ -87,86 +87,241 @@ const decisions = {
   start: {
     question: "What's your primary goal?",
     options: [
-      { text: "Quick information or simple task", next: "rtf" },
-      { text: "Creating content (writing, marketing)", next: "costar" },
-      { text: "Complex analysis or problem-solving", next: "tot" },
-      { text: "Verifying accuracy of information", next: "consistency" },
-      { text: "Teaching or explaining concepts", next: "feynman" },
-      { text: "Brainstorming and ideation", next: "scamper" },
-      { text: "Breaking down large problems", next: "decomposition" }
+      { text: "Quick information or repeatable task", next: "rtf" },
+      { text: "Content creation (writing, marketing, storytelling)", next: "tag" },
+      { text: "Complex analysis, strategy, or research", next: "dream" },
+      { text: "Structured workflow or role-based task", next: "race" },
+      { text: "Problem solving and measurement", next: "pact" },
+      { text: "Breaking down large problems", next: "solve" },
+      { text: "Learning or teaching concepts", next: "feynman" },
+      { text: "Creative ideation or brainstorming", next: "scamper" }
     ]
   },
 
   rtf: {
-    framework: "RTF",
+    framework: "R-T-F",
     title: "Role · Task · Format",
-    description: "RTF minimizes ambiguity, constrains Role, Task, and Format. Ideal for repeatable tasks.",
-    when: ["Tasks with clear success criteria","Operational or repeatable work","High-volume workflows","Brevity improves consistency"],
-    avoid: ["Exploratory problems","Strategic/creative ideation","Back-and-forth refinement"],
-    structure: "Role: Define expertise\nTask: Define action\nFormat: Constrain output shape",
-    example: "Role: Senior copywriter\nTask: Write a follow-up email\nFormat: 5 sentences, friendly tone"
+    description: "Ideal for tasks that require concise, repeatable output. Ensures AI knows exactly what role it is playing, the task at hand, and the format of the output.",
+    when: [
+      "Operational or repetitive work",
+      "Quickly generating content snippets",
+      "Tasks that need a specific output format",
+      "High-volume workflows where consistency matters"
+    ],
+    avoid: [
+      "Creative exploration",
+      "Strategic planning",
+      "Open-ended brainstorming tasks"
+    ],
+    structure: "Role: Specify AI's expertise or persona\nTask: Define the action or deliverable\nFormat: Specify output constraints (length, style, medium)",
+    tips: [
+      "Be as specific as possible about the role; e.g., 'Senior marketing copywriter', not just 'writer'.",
+      "Include format requirements such as word count, tone, or structure.",
+      "Works best for prompts where you want a structured, predictable result."
+    ],
+    example: "Role: Senior copywriter\nTask: Write a follow-up email for leads who downloaded an eBook\nFormat: 5 sentences, friendly and persuasive tone"
   },
 
-  costar: {
-    framework: "COSTAR",
-    title: "Context · Objective · Style · Tone · Audience · Response",
-    description: "COSTAR optimizes content creation where voice, tone, and audience alignment matter.",
-    when: ["Marketing/brand content","Public-facing communication","Audience-specific messaging","Tone mistakes are costly"],
-    avoid: ["Internal analysis","Purely factual lookup","Technical problem-solving"],
-    structure: "Context → Objective → Style → Tone → Audience → Response",
-    example: "Context: Mindfulness app\nObjective: Convince therapists\nStyle: NYTimes\nTone: Credible\nAudience: LCSWs\nResponse: One-page overview"
+  tag: {
+    framework: "T-A-G",
+    title: "Task · Action · Goal",
+    description: "Focuses on clearly defining the task, the action needed, and the measurable goal to guide the AI's output.",
+    when: [
+      "Marketing campaigns and customer engagement",
+      "Operational process improvements",
+      "Small-to-medium strategic initiatives"
+    ],
+    avoid: [
+      "Highly creative or open-ended ideation",
+      "Philosophical discussions",
+      "Tasks with no measurable outcome"
+    ],
+    structure: "Task: Define the task to accomplish\nAction: Specify the action AI should take\nGoal: Define what success looks like (metrics or outcomes)",
+    tips: [
+      "Use measurable outcomes (e.g., % increase in conversion, number of leads).",
+      "Good for short, actionable prompts.",
+      "Helps AI focus on what needs to be done instead of general advice."
+    ],
+    example: "Task: Reduce churn for SaaS users\nAction: Analyze churn data, identify patterns, suggest retention campaigns\nGoal: Improve retention by 15% in 6 months"
   },
 
-  tot: {
-    framework: "Tree of Thoughts",
-    title: "Multi-path reasoning",
-    description: "Tree of Thoughts explores multiple approaches before committing. Useful for strategy and complex decisions.",
-    when: ["Strategic decisions","Multiple viable solutions","Unclear best path","High-stakes choices"],
-    avoid: ["Simple tasks","Time-constrained scenarios","Exploration adds little value"],
-    structure: "1. Generate approaches\n2. Evaluate\n3. Select strongest\n4. Deepen reasoning",
-    example: "Problem: Reduce cloud costs\nGenerate approaches: A, B, C\nEvaluate cost, risk, timeline\nSelect best"
+  dream: {
+    framework: "D-R-E-A-M",
+    title: "Define · Research · Execute · Analyze · Measure",
+    description: "Breaks down complex projects into clear, sequential steps, ensuring the AI considers the full workflow from problem definition to evaluation.",
+    when: [
+      "Product development planning",
+      "Research-heavy initiatives",
+      "Strategic projects that require stepwise execution"
+    ],
+    avoid: [
+      "Quick tasks or one-off questions",
+      "Very simple outputs or short answers"
+    ],
+    structure: "Define: Clarify problem/context\nResearch: Identify sources and gather info\nExecute: Plan and take action\nAnalyze: Review results and patterns\nMeasure: Track success metrics",
+    tips: [
+      "Useful for project managers, researchers, and analysts.",
+      "Helps generate step-by-step plans rather than single outputs.",
+      "Can be combined with other frameworks (like T-A-G) for clarity on goals."
+    ],
+    example: "Define: Low email engagement\nResearch: Analyze past campaigns, survey users\nExecute: Run 3 A/B test campaigns\nAnalyze: Compare engagement across variations\nMeasure: Track CTR and conversion rates"
   },
 
-  consistency: {
-    framework: "Self-Consistency",
-    title: "Accuracy via repetition",
-    description: "Generates multiple answers and finds consensus, reducing hallucinations.",
-    when: ["Factual accuracy is critical","Math/logical tasks","Extraction/classification","Errors costly"],
-    avoid: ["Creative writing","Opinion-based tasks","Latency-sensitive workflows"],
-    structure: "1. Ask multiple times\n2. Compare\n3. Identify consensus\n4. Investigate divergence",
-    example: "Ask question 5 times, compare answers, explain discrepancies"
+  care: {
+    framework: "C-A-R-E",
+    title: "Context · Action · Result · Evaluation",
+    description: "Designed for problem-solving with an emphasis on evaluating outcomes and learning from results.",
+    when: [
+      "Customer success initiatives",
+      "Process improvements",
+      "Project evaluations and reporting"
+    ],
+    avoid: [
+      "Purely creative writing",
+      "Tasks that don’t require evaluation"
+    ],
+    structure: "Context: Set the scene/background\nAction: Steps AI should take\nResult: Expected outcome\nEvaluation: Metrics or criteria for success",
+    tips: [
+      "Great for iterative processes where feedback is key.",
+      "Helps keep tasks structured and measurable.",
+      "Can be paired with analytics prompts for deeper insights."
+    ],
+    example: "Context: Customer complaints rising\nAction: Implement new support workflow\nResult: Reduce complaints by 20%\nEvaluation: Track NPS score and support ticket metrics"
+  },
+
+  solve: {
+    framework: "S-O-L-V-E",
+    title: "Situation · Objective · Limitations · Vision · Execution",
+    description: "Perfect for strategic planning or tackling large-scale problems while considering constraints and long-term goals.",
+    when: [
+      "High-level strategic planning",
+      "Complex problem-solving",
+      "Project management and execution planning"
+    ],
+    avoid: [
+      "Quick or one-off tasks",
+      "Tasks with no defined context or constraints"
+    ],
+    structure: "Situation: Current scenario or problem\nObjective: Desired outcome\nLimitations: Constraints and trade-offs\nVision: Long-term goal or ambition\nExecution: Steps to implement solution",
+    tips: [
+      "Useful for product managers, strategists, and leadership tasks.",
+      "Helps AI provide holistic, actionable plans.",
+      "Include clear constraints to avoid unrealistic suggestions."
+    ],
+    example: "Situation: Launching a SaaS in a competitive market\nObjective: Capture 10% market share\nLimitations: Budget of $50k\nVision: Become the leading eco-friendly platform\nExecution: Social campaigns, influencer partnerships, targeted ads"
+  },
+
+  race: {
+    framework: "R-A-C-E",
+    title: "Role · Action · Context · Expectation",
+    description: "Helps structure role-specific tasks by providing context and desired outcomes, ideal for workflow or operational guidance.",
+    when: [
+      "Role-specific tasks (e.g., marketing, sales, consulting)",
+      "Email or outreach campaigns",
+      "Structured multi-step workflows"
+    ],
+    avoid: [
+      "Abstract brainstorming",
+      "Purely creative, unconstrained tasks"
+    ],
+    structure: "Role: AI’s persona/expertise\nAction: What AI should do\nContext: Relevant background info\nExpectation: Desired output or deliverable",
+    tips: [
+      "Clear role definition improves relevance of AI output.",
+      "Provide enough context to avoid generic responses.",
+      "Use expectation to control the output style or detail level."
+    ],
+    example: "Role: Marketing consultant\nAction: Develop cold email strategy\nContext: Client sells workflow automation\nExpectation: Provide 3 fully written, personalized email templates"
+  },
+
+  pact: {
+    framework: "P-A-C-T",
+    title: "Problem · Approach · Compromise · Test",
+    description: "Structured for problem-solving with measurable results, testing ideas, and defining trade-offs.",
+    when: [
+      "Product management",
+      "Optimization tasks",
+      "A/B testing or experimental approaches"
+    ],
+    avoid: [
+      "Purely creative ideation",
+      "Tasks without measurable outcomes"
+    ],
+    structure: "Problem: Define challenge\nApproach: Plan to tackle it\nCompromise: Constraints or trade-offs\nTest: How success is measured",
+    tips: [
+      "Use for experimentation or process optimization.",
+      "Great for iterative testing and refinement.",
+      "Combine with metrics or KPIs to evaluate results."
+    ],
+    example: "Problem: Low trial-to-paid conversion\nApproach: Revamp onboarding process\nCompromise: Keep only key features for MVP\nTest: Measure increase in paid conversions over 30 days"
+  },
+
+  rise: {
+    framework: "R-I-S-E",
+    title: "Role · Input · Steps · Expectation",
+    description: "Focuses on stepwise guidance for tasks requiring clear inputs and procedural outputs.",
+    when: [
+      "Workflow guidance",
+      "Step-by-step operational tasks",
+      "Data-driven or instructional outputs"
+    ],
+    avoid: [
+      "Abstract ideation",
+      "High-level strategic planning only"
+    ],
+    structure: "Role: AI’s expertise\nInput: Data or material AI will use\nSteps: Specific actions AI should take\nExpectation: Desired output",
+    tips: [
+      "Excellent for structured procedural instructions.",
+      "Helps AI follow a workflow or checklist.",
+      "Combine with metrics to verify completion."
+    ],
+    example: "Role: Product manager\nInput: Customer feedback dataset\nSteps: Categorize feedback, prioritize issues, propose solutions\nExpectation: Actionable roadmap insights"
   },
 
   feynman: {
     framework: "Feynman Technique",
     title: "Explain by simplifying",
-    description: "Simplifies concepts to ensure true understanding.",
-    when: ["Teaching complex concepts","Learning unfamiliar domains","Identify gaps","Educational content"],
-    avoid: ["Expert-to-expert communication","Technical documentation","Precision-critical tasks"],
-    structure: "1. Explain to beginner\n2. Avoid jargon\n3. Use analogies\n4. Build from first principles",
-    example: "Explain LLMs to a curious 12-year-old using simple analogies"
+    description: "Useful for teaching, learning, or simplifying complex concepts into digestible explanations.",
+    when: [
+      "Learning new concepts",
+      "Teaching others",
+      "Creating educational content"
+    ],
+    avoid: [
+      "Highly technical expert-to-expert communication",
+      "Tasks requiring exact numeric precision"
+    ],
+    structure: "Explain in simple terms → Avoid jargon → Use analogies → Build conceptual understanding",
+    tips: [
+      "Ask AI to imagine explaining to a 12-year-old for maximal simplicity.",
+      "Helps identify knowledge gaps.",
+      "Useful for making technical content accessible."
+    ],
+    example: "Explain LLMs to a curious 12-year-old using simple analogies like a library that learns from books"
   },
 
   scamper: {
     framework: "SCAMPER",
     title: "Structured Ideation",
-    description: "Generates ideas systematically using substitution, combination, adaptation, etc.",
-    when: ["Product ideation","Creative blocks","Brainstorming sessions"],
-    avoid: ["Execution tasks"],
+    description: "Systematic creative thinking method using substitution, combination, adaptation, modification, putting to other use, elimination, and reversal.",
+    when: [
+      "Product ideation",
+      "Brainstorming sessions",
+      "Creative problem-solving"
+    ],
+    avoid: [
+      "Purely operational tasks",
+      "Analytical problem-solving"
+    ],
     structure: "Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse",
-    example: "Redesign a coffee mug using SCAMPER methods"
-  },
-
-  decomposition: {
-    framework: "Problem Decomposition",
-    title: "Break problems down",
-    description: "Splits large problems into manageable sub-problems.",
-    when: ["Large ambiguous problems","Complex projects"],
-    avoid: ["Simple tasks"],
-    structure: "Identify sub-problems → dependencies → priorities",
-    example: "Break launching a SaaS into validation, tech, marketing, funding"
+    tips: [
+      "Use SCAMPER to generate multiple creative options quickly.",
+      "Works well for both product design and process innovation.",
+      "Combine with R-T-F for output formatting if needed."
+    ],
+    example: "Redesign a coffee mug using SCAMPER: Substitute plastic with bamboo, Combine with storage lid, Adapt shape for better grip, Modify handle, Put to other use as pen holder, Eliminate waste, Reverse orientation"
   }
 };
+
 
 // =========================
 // RENDER LOGIC
