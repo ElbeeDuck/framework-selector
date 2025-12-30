@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,41 +58,23 @@
     padding: 16px;
     border-radius: 12px;
     font-size: 0.9rem;
+    color: white;
   }
   .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
   .actions button { width: auto; padding: 10px 18px; }
-  input, select { width: 100%; padding: 10px; margin: 6px 0; border-radius: 8px; border: none; color: black; }
-  .generator { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; margin-top: 24px; }
 </style>
 </head>
 <body>
 
 <div class="container">
   <h1>AI Prompting Resource</h1>
-  <p>Navigate the frameworks and generate ready-to-use prompts.</p>
+  <p>Navigate the frameworks to find the best prompting method for your task.</p>
 
   <div id="app" class="card"></div>
 
   <div class="actions">
     <button onclick="goBack()">← Back</button>
     <button onclick="reset()">Start Over</button>
-  </div>
-
-  <div class="generator card">
-    <h2>Interactive Prompt Generator</h2>
-    <p>Fill in the fields below to create a ready-to-use prompt.</p>
-    <label>Framework:</label>
-    <select id="frameworkSelect">
-      <option value="">-- Select Framework --</option>
-    </select>
-    <label>Role / Actor:</label>
-    <input type="text" id="roleInput" placeholder="e.g., Senior copywriter" />
-    <label>Task / Input / Instructions:</label>
-    <input type="text" id="taskInput" placeholder="e.g., Write a follow-up email..." />
-    <label>Format / Output Style:</label>
-    <input type="text" id="formatInput" placeholder="e.g., 5 sentences, friendly tone" />
-    <button onclick="generatePrompt()">Generate Prompt</button>
-    <pre id="generatedPrompt"></pre>
   </div>
 </div>
 
@@ -228,25 +209,6 @@ function render() {
 function choose(next) { history.push(current); current = next; render(); }
 function goBack() { if(history.length){ current = history.pop(); render(); } }
 function reset() { history=[]; current="start"; render(); }
-
-// =========================
-// PROMPT GENERATOR
-// =========================
-const frameworkSelect = document.getElementById("frameworkSelect");
-Object.values(decisions).forEach(f => { if(f.framework) frameworkSelect.innerHTML += `<option value="${f.framework}">${f.framework}</option>`; });
-
-function generatePrompt() {
-  const fw = frameworkSelect.value;
-  const role = document.getElementById("roleInput").value.trim();
-  const task = document.getElementById("taskInput").value.trim();
-  const format = document.getElementById("formatInput").value.trim();
-
-  if(!fw || !role || !task){ alert("Please fill in framework, role, and task."); return; }
-
-  let prompt = `Framework: ${fw}\nRole: ${role}\nTask: ${task}`;
-  if(format) prompt += `\nFormat: ${format}`;
-  document.getElementById("generatedPrompt").innerText = prompt;
-}
 
 render();
 </script>
