@@ -1,290 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Prompting Framework Selector</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #581c87, #0f172a);
-      color: #fff;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 32px;
-    }
-    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    h2 { font-size: 1.75rem; }
-    p { color: #d8b4fe; }
-    button {
-      width: 100%;
-      padding: 14px;
-      margin: 8px 0;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: rgba(255,255,255,0.15);
-      border-color: #c084fc;
-    }
-    .card {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      padding: 24px;
-      margin-top: 24px;
-    }
-    .pill {
-      display: inline-block;
-      padding: 6px 10px;
-      margin-right: 6px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.15);
-      font-size: 0.8rem;
-    }
-    pre {
-      white-space: pre-wrap;
-      background: rgba(255,255,255,0.08);
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-    }
-    .actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .actions button {
-      width: auto;
-      padding: 10px 18px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Prompting Resource</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #581c87, #0f172a);
+    color: #fff;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 32px;
+  }
+  h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  p { color: #d8b4fe; }
+  button {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: #c084fc;
+  }
+  .card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 24px;
+  }
+  .pill {
+    display: inline-block;
+    padding: 6px 10px;
+    margin: 4px 6px 4px 0;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    font-size: 0.8rem;
+  }
+  pre {
+    white-space: pre-wrap;
+    background: rgba(255,255,255,0.08);
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+  .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+  .actions button { width: auto; padding: 10px 18px; }
+  input, select { width: 100%; padding: 10px; margin: 6px 0; border-radius: 8px; border: none; }
+  .generator { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 16px; margin-top: 24px; }
+</style>
 </head>
 <body>
 
 <div class="container">
-  <h1>AI Prompting Framework Selector</h1>
-  <p>Answer a few questions to find the best prompting framework</p>
+  <h1>AI Prompting Resource</h1>
+  <p>Navigate the frameworks and generate ready-to-use prompts.</p>
 
   <div id="app" class="card"></div>
 
   <div class="actions">
     <button onclick="goBack()">← Back</button>
     <button onclick="reset()">Start Over</button>
-    <a href="framework-selector.html" 
-       class="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
-       Further Prompting Framework Help →
-    </a>
+  </div>
+
+  <div class="generator card">
+    <h2>Interactive Prompt Generator</h2>
+    <p>Fill in the fields below to create a ready-to-use prompt.</p>
+    <label>Framework:</label>
+    <select id="frameworkSelect">
+      <option value="">-- Select Framework --</option>
+    </select>
+    <label>Role / Actor:</label>
+    <input type="text" id="roleInput" placeholder="e.g., Senior copywriter" />
+    <label>Task / Input / Instructions:</label>
+    <input type="text" id="taskInput" placeholder="e.g., Write a follow-up email..." />
+    <label>Format / Output Style:</label>
+    <input type="text" id="formatInput" placeholder="e.g., 5 sentences, friendly tone" />
+    <button onclick="generatePrompt()">Generate Prompt</button>
+    <pre id="generatedPrompt"></pre>
   </div>
 </div>
 
 <script>
+// =========================
+// FRAMEWORK DATA
+// =========================
 const decisions = {
   start: {
     question: "What's your primary goal?",
     options: [
-      ["Quick information or a well-defined task", "rtf"],
-      ["Creating content where voice and audience matter", "costar"],
-      ["Complex reasoning, strategy, or decision-making", "tot"],
-      ["Teaching, learning, or explaining ideas clearly", "feynman"],
-      ["Verifying correctness or reducing hallucinations", "consistency"]
+      { text: "Quick information or simple task", next: "rtf" },
+      { text: "Creating content (writing, marketing)", next: "costar" },
+      { text: "Complex analysis or problem-solving", next: "tot" },
+      { text: "Verifying accuracy of information", next: "consistency" },
+      { text: "Teaching or explaining concepts", next: "feynman" },
+      { text: "Brainstorming and ideation", next: "scamper" },
+      { text: "Breaking down large problems", next: "decomposition" }
     ]
   },
 
   rtf: {
     framework: "RTF",
     title: "Role · Task · Format",
-    description: `
-RTF is a precision framework designed to minimize ambiguity while keeping prompts short.
-It works by constraining the model's perspective (Role), defining exactly what it should do (Task),
-and eliminating guesswork about output shape (Format).
-
-RTF is ideal when you already know what you want and speed matters more than exploration.
-`,
-    when: [
-      "Tasks with clear success criteria",
-      "Operational or repeatable work",
-      "High-volume prompting workflows",
-      "Situations where brevity improves consistency"
-    ],
-    avoid: [
-      "Ill-defined or exploratory problems",
-      "Strategic or creative ideation",
-      "Situations requiring back-and-forth refinement"
-    ],
-    structure: `
-Role: Specify the expertise or viewpoint the model should adopt
-Task: Define the exact action to perform
-Format: Constrain length, structure, or style of the output
-`,
-    example: `
-Role: Senior B2B SaaS copywriter
-Task: Write a follow-up email to a prospect who attended a demo but hasn’t replied
-Format: 5 sentences, professional but friendly tone, end with a single clear CTA
-`
+    description: "RTF minimizes ambiguity, constrains Role, Task, and Format. Ideal for repeatable tasks.",
+    when: ["Tasks with clear success criteria","Operational or repeatable work","High-volume workflows","Brevity improves consistency"],
+    avoid: ["Exploratory problems","Strategic/creative ideation","Back-and-forth refinement"],
+    structure: "Role: Define expertise\nTask: Define action\nFormat: Constrain output shape",
+    example: "Role: Senior copywriter\nTask: Write a follow-up email\nFormat: 5 sentences, friendly tone"
   },
 
   costar: {
     framework: "COSTAR",
     title: "Context · Objective · Style · Tone · Audience · Response",
-    description: `
-COSTAR is a high-fidelity content framework optimized for situations where nuance, voice,
-and audience alignment matter. It reduces misalignment by making implicit expectations explicit.
-
-This framework shines in marketing, branding, public communication, and any scenario
-where “how it sounds” is as important as “what it says.”
-`,
-    when: [
-      "Marketing or brand-sensitive content",
-      "Public-facing communication",
-      "Audience-specific messaging",
-      "Situations where tone mistakes are costly"
-    ],
-    avoid: [
-      "Internal analysis or reasoning tasks",
-      "Purely factual lookups",
-      "Data-heavy or technical problem-solving"
-    ],
-    structure: `
-Context: Background, constraints, and situation
-Objective: What success looks like
-Style: Reference examples or writing conventions
-Tone: Emotional quality (e.g., confident, empathetic)
-Audience: Who the content is for
-Response: Desired format and length
-`,
-    example: `
-Context: A mindfulness app competing with Headspace
-Objective: Convince therapists to recommend the app to clients
-Style: NYTimes health section
-Tone: Credible, respectful, non-salesy
-Audience: Licensed therapists (LCSW, 30–60)
-Response: One-page persuasive overview with bullet sections
-`
+    description: "COSTAR optimizes content creation where voice, tone, and audience alignment matter.",
+    when: ["Marketing/brand content","Public-facing communication","Audience-specific messaging","Tone mistakes are costly"],
+    avoid: ["Internal analysis","Purely factual lookup","Technical problem-solving"],
+    structure: "Context → Objective → Style → Tone → Audience → Response",
+    example: "Context: Mindfulness app\nObjective: Convince therapists\nStyle: NYTimes\nTone: Credible\nAudience: LCSWs\nResponse: One-page overview"
   },
 
   tot: {
     framework: "Tree of Thoughts",
-    title: "Multi-path reasoning and evaluation",
-    description: `
-Tree of Thoughts (ToT) is designed for complex problems where a single linear chain
-of reasoning is insufficient. Instead of committing early, the model explores multiple
-distinct approaches, evaluates them, and then deepens the strongest path.
+    title: "Multi-path reasoning",
+    description: "Tree of Thoughts explores multiple approaches before committing. Useful for strategy and complex decisions.",
+    when: ["Strategic decisions","Multiple viable solutions","Unclear best path","High-stakes choices"],
+    avoid: ["Simple tasks","Time-constrained scenarios","Exploration adds little value"],
+    structure: "1. Generate approaches\n2. Evaluate\n3. Select strongest\n4. Deepen reasoning",
+    example: "Problem: Reduce cloud costs\nGenerate approaches: A, B, C\nEvaluate cost, risk, timeline\nSelect best"
+  },
 
-This framework is especially useful for strategy, architecture decisions, and
-high-stakes trade-off analysis.
-`,
-    when: [
-      "Strategic decision-making",
-      "Problems with multiple viable solutions",
-      "Situations with unclear best path forward",
-      "High-impact or irreversible decisions"
-    ],
-    avoid: [
-      "Simple or well-scoped tasks",
-      "Time-constrained scenarios",
-      "Situations where exploration adds little value"
-    ],
-    structure: `
-1. Generate multiple distinct approaches
-2. Evaluate each against explicit criteria
-3. Select the strongest option
-4. Continue reasoning in depth on the chosen path
-`,
-    example: `
-Problem: Reduce cloud infrastructure costs by 30%
-
-Generate three approaches:
-A) Optimize existing architecture
-B) Migrate services to cheaper providers
-C) Redesign system boundaries
-
-Evaluate each on cost reduction, risk, timeline, and engineering effort.
-Select the best option and provide a detailed execution plan.
-`
+  consistency: {
+    framework: "Self-Consistency",
+    title: "Accuracy via repetition",
+    description: "Generates multiple answers and finds consensus, reducing hallucinations.",
+    when: ["Factual accuracy is critical","Math/logical tasks","Extraction/classification","Errors costly"],
+    avoid: ["Creative writing","Opinion-based tasks","Latency-sensitive workflows"],
+    structure: "1. Ask multiple times\n2. Compare\n3. Identify consensus\n4. Investigate divergence",
+    example: "Ask question 5 times, compare answers, explain discrepancies"
   },
 
   feynman: {
     framework: "Feynman Technique",
     title: "Explain by simplifying",
-    description: `
-The Feynman Technique forces clarity by requiring explanations that a beginner
-could understand. If an explanation cannot be made simple, it usually means
-the underlying understanding is incomplete.
-
-This framework is powerful for teaching, learning, and testing comprehension.
-`,
-    when: [
-      "Teaching complex concepts",
-      "Learning unfamiliar domains",
-      "Identifying gaps in understanding",
-      "Creating educational content"
-    ],
-    avoid: [
-      "Expert-to-expert communication",
-      "Highly technical documentation",
-      "Situations where precision matters more than intuition"
-    ],
-    structure: `
-1. Explain the concept as if to a beginner
-2. Avoid jargon or define it clearly
-3. Use analogies and concrete examples
-4. Build from first principles
-`,
-    example: `
-Explain how large language models work as if you were teaching a curious 12-year-old.
-Use everyday analogies, avoid technical jargon, and explain each idea before moving on.
-`
+    description: "Simplifies concepts to ensure true understanding.",
+    when: ["Teaching complex concepts","Learning unfamiliar domains","Identify gaps","Educational content"],
+    avoid: ["Expert-to-expert communication","Technical documentation","Precision-critical tasks"],
+    structure: "1. Explain to beginner\n2. Avoid jargon\n3. Use analogies\n4. Build from first principles",
+    example: "Explain LLMs to a curious 12-year-old using simple analogies"
   },
 
-  consistency: {
-    framework: "Self-Consistency",
-    title: "Accuracy through repetition",
-    description: `
-Self-Consistency improves reliability by leveraging variation. By generating multiple
-independent answers to the same prompt and comparing them, you can identify consensus,
-surface uncertainty, and reduce hallucinations.
+  scamper: {
+    framework: "SCAMPER",
+    title: "Structured Ideation",
+    description: "Generates ideas systematically using substitution, combination, adaptation, etc.",
+    when: ["Product ideation","Creative blocks","Brainstorming sessions"],
+    avoid: ["Execution tasks"],
+    structure: "Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse",
+    example: "Redesign a coffee mug using SCAMPER methods"
+  },
 
-This approach trades cost and speed for higher confidence.
-`,
-    when: [
-      "Factual accuracy is critical",
-      "Math or logical reasoning tasks",
-      "Classification or extraction tasks",
-      "Situations where errors are costly"
-    ],
-    avoid: [
-      "Creative writing",
-      "Opinion-based tasks",
-      "Cost- or latency-sensitive workflows"
-    ],
-    structure: `
-1. Ask the same question multiple times independently
-2. Compare the results
-3. Identify consensus and divergence
-4. Flag uncertainty or investigate disagreements
-`,
-    example: `
-Answer the following question 5 times independently:
-"What is the CAGR given X, Y, and Z?"
-
-Then:
-- Identify the most common answer
-- Explain any discrepancies
-- State confidence level in the final result
-`
+  decomposition: {
+    framework: "Problem Decomposition",
+    title: "Break problems down",
+    description: "Splits large problems into manageable sub-problems.",
+    when: ["Large ambiguous problems","Complex projects"],
+    avoid: ["Simple tasks"],
+    structure: "Identify sub-problems → dependencies → priorities",
+    example: "Break launching a SaaS into validation, tech, marketing, funding"
   }
 };
 
+// =========================
+// RENDER LOGIC
+// =========================
 let history = [];
 let current = "start";
 
@@ -295,9 +198,7 @@ function render() {
   if (!node.framework) {
     app.innerHTML = `
       <h2>${node.question}</h2>
-      ${node.options.map(o =>
-        `<button onclick="choose('${o[1]}')">${o[0]}</button>`
-      ).join("")}
+      ${node.options.map(o => `<button onclick="choose('${o.next}')">${o.text}</button>`).join("")}
     `;
   } else {
     app.innerHTML = `
@@ -320,23 +221,30 @@ function render() {
   }
 }
 
-function choose(next) {
-  history.push(current);
-  current = next;
-  render();
-}
+// =========================
+// NAVIGATION
+// =========================
+function choose(next) { history.push(current); current = next; render(); }
+function goBack() { if(history.length){ current = history.pop(); render(); } }
+function reset() { history=[]; current="start"; render(); }
 
-function goBack() {
-  if (history.length) {
-    current = history.pop();
-    render();
-  }
-}
+// =========================
+// PROMPT GENERATOR
+// =========================
+const frameworkSelect = document.getElementById("frameworkSelect");
+Object.values(decisions).forEach(f => { if(f.framework) frameworkSelect.innerHTML += `<option value="${f.framework}">${f.framework}</option>`; });
 
-function reset() {
-  history = [];
-  current = "start";
-  render();
+function generatePrompt() {
+  const fw = frameworkSelect.value;
+  const role = document.getElementById("roleInput").value.trim();
+  const task = document.getElementById("taskInput").value.trim();
+  const format = document.getElementById("formatInput").value.trim();
+
+  if(!fw || !role || !task){ alert("Please fill in framework, role, and task."); return; }
+
+  let prompt = `Framework: ${fw}\nRole: ${role}\nTask: ${task}`;
+  if(format) prompt += `\nFormat: ${format}`;
+  document.getElementById("generatedPrompt").innerText = prompt;
 }
 
 render();
