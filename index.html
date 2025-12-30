@@ -25,14 +25,15 @@
     width: 100%;
     padding: 14px;
     margin: 8px 0;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
     color: white;
     font-size: 1rem;
     cursor: pointer;
     transition: 0.2s;
   }
+
   button:hover {
     background: rgba(255,255,255,0.15);
     border-color: #c084fc;
@@ -177,11 +178,17 @@ function render() {
   const node = decisions[current];
   const app = document.getElementById("app");
 
-  if (!node.framework) {
-    app.innerHTML = `
-      <h2>${node.question}</h2>
-      ${node.options.map(o => `<button onclick="choose('${o.next}')">${o.text}</button>`).join("")}
-    `;
+if (!node.framework) {
+  app.innerHTML = `
+    <h2>${node.question}</h2>
+    <div class="space-y-3">
+      ${node.options.map(o => `
+        <button onclick="choose('${o.next}')">
+          ${o.text}
+        </button>
+      `).join("")}
+    </div>
+  `;
   } else {
     app.innerHTML = `
       <h2>${node.framework}</h2>
