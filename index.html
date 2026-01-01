@@ -1,379 +1,602 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Prompting Resource</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #0f172a, #581c87, #0f172a);
-    color: #fff;
-    min-height: 100vh;
-  }
-  .container {
-    max-width: 1000px;
-    margin: auto;
-    padding: 32px;
-  }
-  h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-  h2 { font-size: 1.75rem; margin-bottom: 0.5rem; }
-  p { color: #d8b4fe; }
-  button {
-    width: 100%;
-    padding: 14px;
-    margin: 8px 0;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: #c084fc;
-  }
-  .card {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    padding: 24px;
-    margin-top: 24px;
-  }
-  .pill {
-    display: inline-block;
-    padding: 6px 10px;
-    margin: 4px 6px 4px 0;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.15);
-    font-size: 0.8rem;
-  }
-  pre {
-    white-space: pre-wrap;
-    background: rgba(255,255,255,0.08);
-    padding: 16px;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    color: white;
-  }
-  .actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
-  .actions button { width: auto; padding: 10px 18px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompting Framework Selector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #581c87, #0f172a);
+            min-height: 100vh;
+        }
+    </style>
 </head>
 <body>
+    <div id="app"></div>
 
-<div class="container">
-  <h1>AI Prompting Resource</h1>
-  <p>Navigate the frameworks to find the best prompting method for your task.</p>
+    <script>
+        const decisions = {
+            start: {
+                question: "What's your primary goal?",
+                options: [
+                    { text: "Quick information or simple task", next: "simple" },
+                    { text: "Creating content (writing, marketing)", next: "content" },
+                    { text: "Complex analysis or problem-solving", next: "complex" },
+                    { text: "Verifying accuracy of information", next: "verify" },
+                    { text: "Teaching or explaining concepts", next: "teaching" },
+                    { text: "Brainstorming and ideation", next: "creative" },
+                    { text: "Data analysis and research", next: "data" }
+                ]
+            },
+            simple: {
+                question: "How well-defined is your task?",
+                options: [
+                    { text: "Very clear - I know exactly what I want", next: "rtf" },
+                    { text: "Need some structure and context", next: "aim" },
+                    { text: "Want AI to ask me clarifying questions first", next: "flipped" }
+                ]
+            },
+            content: {
+                question: "What type of content creation?",
+                options: [
+                    { text: "Marketing/brand content - voice is critical", next: "costar" },
+                    { text: "Long-form writing (articles, essays)", next: "content_long" },
+                    { text: "Creative writing (stories, fiction)", next: "creative_writing" },
+                    { text: "Just need a quick draft", next: "rtf" }
+                ]
+            },
+            content_long: {
+                question: "What's your approach to this content?",
+                options: [
+                    { text: "Need to develop it step-by-step", next: "outline" },
+                    { text: "Want multiple angles before choosing", next: "tot" },
+                    { text: "Standard structured approach", next: "aim" }
+                ]
+            },
+            creative_writing: {
+                question: "What level of creative control do you want?",
+                options: [
+                    { text: "High - I want to guide the narrative closely", next: "saga" },
+                    { text: "Collaborative - back and forth development", next: "outline" },
+                    { text: "Exploratory - see what AI generates", next: "tot" }
+                ]
+            },
+            complex: {
+                question: "What type of complexity?",
+                options: [
+                    { text: "Multi-step process with clear stages", next: "risen" },
+                    { text: "Multiple possible approaches to explore", next: "tot" },
+                    { text: "Need AI to reason through it step-by-step", next: "reasoning" },
+                    { text: "Strategic decision with trade-offs", next: "tot" },
+                    { text: "Breaking down a large ambiguous problem", next: "decomposition" }
+                ]
+            },
+            reasoning: {
+                question: "What kind of reasoning do you need?",
+                options: [
+                    { text: "Show me the thinking process explicitly", next: "cot" },
+                    { text: "Reason about multiple approaches simultaneously", next: "tot" },
+                    { text: "Consider analogies and similar problems", next: "analogical" },
+                    { text: "Break problem into smaller parts first", next: "decomposition" }
+                ]
+            },
+            verify: {
+                question: "What are you verifying?",
+                options: [
+                    { text: "Factual accuracy (dates, numbers, facts)", next: "consistency" },
+                    { text: "Logic and reasoning quality", next: "self_refine" },
+                    { text: "Multiple perspectives on an issue", next: "perspectives" },
+                    { text: "Comprehensive coverage of a topic", next: "consistency" }
+                ]
+            },
+            teaching: {
+                question: "What's your teaching scenario?",
+                options: [
+                    { text: "Explaining complex concepts simply", next: "feynman" },
+                    { text: "Socratic method - learning through questions", next: "socratic" },
+                    { text: "Creating lesson plans or curricula", next: "risen" },
+                    { text: "Adapting to different knowledge levels", next: "audience_adapt" }
+                ]
+            },
+            creative: {
+                question: "What type of ideation?",
+                options: [
+                    { text: "Generate many diverse ideas quickly", next: "scamper" },
+                    { text: "Explore one idea deeply from multiple angles", next: "tot" },
+                    { text: "Challenge assumptions and status quo", next: "contrarian" },
+                    { text: "Build on existing ideas incrementally", next: "iterate" }
+                ]
+            },
+            data: {
+                question: "What's your data task?",
+                options: [
+                    { text: "Analyzing patterns and insights", next: "data_analysis" },
+                    { text: "Comparing multiple sources/options", next: "comparison" },
+                    { text: "Deep research on a topic", next: "research_deep" },
+                    { text: "Synthesizing complex information", next: "synthesis" }
+                ]
+            },
+            data_analysis: {
+                question: "How structured is your analysis?",
+                options: [
+                    { text: "Highly structured with clear steps", next: "risen" },
+                    { text: "Exploratory - finding patterns", next: "tot" },
+                    { text: "Need verification of findings", next: "consistency" }
+                ]
+            },
+            rtf: {
+                framework: "RTF",
+                title: "Role · Task · Format",
+                description: "The minimalist framework for quick, well-defined tasks",
+                when: ["Rapid iteration needed", "Simple, clear requirements", "High-volume prompting", "You know exactly what you want"],
+                avoid: ["Ambiguous problems", "High-stakes decisions", "Complex analysis"],
+                structure: "Role: Who's doing this?\nTask: What needs doing?\nFormat: How should it look?",
+                example: "Role: Professional email writer\nTask: Draft investor follow-up\nFormat: 4 sentences, warm tone, clear CTA"
+            },
+            aim: {
+                framework: "AIM",
+                title: "Actor · Input · Mission",
+                description: "The balanced, general-purpose framework",
+                when: ["Most everyday tasks", "Need context grounding", "Moderate complexity", "Standard interactions"],
+                avoid: ["Extremely simple queries", "When process steps matter more than context"],
+                structure: "Actor: Define who AI is acting as\nInput: Provide relevant context/data\nMission: State desired outcome",
+                example: "Actor: Senior test engineer\nInput: Node.js payment retry service\nMission: Design automated tests maximizing confidence"
+            },
+            risen: {
+                framework: "RISEN",
+                title: "Role · Instructions · Steps · End goal · Narrowing",
+                description: "The detailed framework for complex, multi-stage workflows",
+                when: ["Complex analytical tasks", "Order of operations matters", "Need consistency across prompts", "Training others to prompt"],
+                avoid: ["Quick queries", "Creative exploration", "Time-sensitive tasks"],
+                structure: "Role: Expert persona\nInstructions: Core task\nSteps: Ordered process (1,2,3...)\nEnd goal: Specific deliverable\nNarrowing: Constraints, boundaries",
+                example: "Role: B2B SaaS retention specialist\nInstructions: Analyze churn data\nSteps: 1. Segment customers 2. Correlate metrics 3. Find themes 4. Prioritize\nEnd goal: Presentation deck\nNarrowing: Enterprise only, visualizations"
+            },
+            costar: {
+                framework: "COSTAR",
+                title: "Context · Objective · Style · Tone · Audience · Response",
+                description: "The comprehensive framework for content where voice matters",
+                when: ["Marketing copy", "Public-facing content", "Brand voice is critical", "Audience-specific writing"],
+                avoid: ["Internal analysis", "Quick factual queries", "Data work"],
+                structure: "Context: Background & constraints\nObjective: What to achieve\nStyle: Reference examples\nTone: Emotional resonance\nAudience: Who receives this\nResponse: Structure & length",
+                example: "Context: Mental health app vs Headspace\nObjective: Get therapists to recommend\nStyle: NYT health section\nTone: Respectful, collaborative\nAudience: LCSWs, 30-60\nResponse: One-page PDF"
+            },
+            tot: {
+                framework: "Tree of Thoughts",
+                title: "Tree of Thoughts (ToT)",
+                description: "Explore multiple reasoning paths simultaneously, then select the best",
+                when: ["Complex problem-solving", "Strategic decisions", "Need to explore solution space", "High-stakes choices"],
+                avoid: ["Well-defined problems", "Time pressure", "Simple queries"],
+                structure: "Generate multiple approaches → Evaluate each → Select best → Continue with details\n\nPrompt: 'Generate 3 different approaches:\nA: [path]\nB: [path]\nC: [path]\nEvaluate each, then detail the best.'",
+                example: "Problem: Reduce costs 30%\nBranch A: Optimize architecture\nBranch B: Migrate services\nBranch C: Redesign\nEvaluate all on cost/time/risk, detail top path"
+            },
+            consistency: {
+                framework: "Self-Consistency",
+                title: "Self-Consistency",
+                description: "Generate same answer multiple times, take majority vote for accuracy",
+                when: ["Factual accuracy critical", "Math problems", "Classification tasks", "Detecting hallucinations"],
+                avoid: ["Creative tasks", "Opinion/analysis questions", "Cost-sensitive scenarios"],
+                structure: "Ask same question 5-10 times independently → Compare answers → Take consensus → Flag divergence\n\nPrompt: 'Answer this 5 times independently, then identify consensus and any variation.'",
+                example: "Calculate ROI 5 different ways:\n- Spend: $50k\n- Revenue: $180k\n- Customer LTV: $5k\nRun 5 times, compare results"
+            },
+            cot: {
+                framework: "Chain of Thought",
+                title: "Chain of Thought (CoT)",
+                description: "Explicit step-by-step reasoning before arriving at conclusion",
+                when: ["Complex reasoning tasks", "Math or logic problems", "Need transparency in thinking", "Building trust in answers"],
+                avoid: ["Simple factual queries", "When brevity is critical", "Creative tasks"],
+                structure: "Prompt: 'Think step-by-step about [problem]:\n1. First consider...\n2. Then analyze...\n3. Finally conclude...'\n\nOr: 'Let's approach this systematically. Show your reasoning at each step.'",
+                example: "Problem: Calculate compound interest\n'Think step-by-step:\n1. Identify variables (principal, rate, time)\n2. Choose formula\n3. Plug in values\n4. Calculate step-by-step\n5. Verify result'"
+            },
+            flipped: {
+                framework: "Flipped Interaction",
+                title: "Flipped Interaction / Reverse Prompting",
+                description: "AI asks YOU clarifying questions before answering",
+                when: ["Ambiguous requests", "You're not sure what you need", "Exploring possibilities", "Avoiding assumptions"],
+                avoid: ["Clear, well-defined tasks", "Time-critical queries", "When you have full context"],
+                structure: "Prompt: 'Before answering, ask me any clarifying questions you need. If none needed, say \"No clarification needed\" and proceed.'\n\nOr: 'What information is missing that would improve your answer?'",
+                example: "User: 'Help me with my website'\nAI: 'To give the best advice, I need to know:\n1. What's the website's purpose?\n2. Current issues you're facing?\n3. Your technical skill level?\n4. Budget/time constraints?'"
+            },
+            feynman: {
+                framework: "Feynman Technique",
+                title: "Feynman Technique",
+                description: "Explain complex topics as if teaching a beginner - reveals gaps",
+                when: ["Simplifying complex concepts", "Teaching or tutoring", "Testing your own understanding", "Creating educational content"],
+                avoid: ["Expert-to-expert communication", "Technical documentation", "Time-sensitive tasks"],
+                structure: "Prompt: 'Explain [complex topic] as if I'm a curious 12-year-old. Use:\n- Simple analogies\n- No jargon (or define it)\n- Real-world examples\n- Build from basics'",
+                example: "'Explain quantum entanglement using only concepts a middle schooler knows. Use everyday analogies and check that each step makes sense before moving forward.'"
+            },
+            socratic: {
+                framework: "Socratic Method",
+                title: "Socratic Method",
+                description: "Learn through guided questions rather than direct answers",
+                when: ["Teaching critical thinking", "Helping someone learn (not just know)", "Exploring philosophical questions", "Developing reasoning skills"],
+                avoid: ["Need quick answers", "Factual information requests", "Time pressure"],
+                structure: "Prompt: 'Don't give me the answer. Instead, ask me questions that guide me to figure it out myself. After each of my responses, ask a follow-up question that pushes my thinking deeper.'",
+                example: "User: 'What's the best database for my app?'\nAI: 'Let's explore this together. What kind of data relationships does your app have? Are they mostly hierarchical, or do you have complex many-to-many relationships?'"
+            },
+            scamper: {
+                framework: "SCAMPER",
+                title: "SCAMPER Method",
+                description: "Ideation technique: Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse",
+                when: ["Brainstorming innovations", "Product development", "Creative problem-solving", "Overcoming creative blocks"],
+                avoid: ["When you need focused execution", "Analytical tasks", "Factual queries"],
+                structure: "Apply each lens:\nSubstitute: What can I replace?\nCombine: What can I merge?\nAdapt: What else is like this?\nModify: What can I change?\nPut to other use: New contexts?\nEliminate: What can I remove?\nReverse: What if I flip it?",
+                example: "Product: Standard coffee mug\nSubstitute: Material → bamboo\nCombine: Add phone holder\nAdapt: Like a thermos\nModify: Make collapsible\nOther use: Planter\nEliminate: Remove handle\nReverse: Heat from outside in"
+            },
+            decomposition: {
+                framework: "Problem Decomposition",
+                title: "Problem Decomposition",
+                description: "Break large ambiguous problems into smaller, manageable sub-problems",
+                when: ["Overwhelming complex problems", "Unclear where to start", "Multiple interconnected issues", "Large projects"],
+                avoid: ["Already well-defined problems", "Simple queries", "Time pressure"],
+                structure: "Prompt: 'Break [large problem] into:\n1. Core sub-problems (3-5)\n2. Dependencies between them\n3. Which to tackle first\n4. Success criteria for each'",
+                example: "'I want to launch a SaaS product.'\n→ Break into:\n1. Product validation\n2. Technical architecture\n3. Go-to-market\n4. Funding\nThen detail each with sub-tasks"
+            },
+            analogical: {
+                framework: "Analogical Reasoning",
+                title: "Analogical Reasoning",
+                description: "Solve problems by finding and applying similar solved problems",
+                when: ["Novel problems", "Cross-domain innovation", "Learning from other fields", "Creative solutions"],
+                avoid: ["Domain-specific technical work", "When direct solutions exist", "Legal or compliance tasks"],
+                structure: "Prompt: 'What problems similar to [my problem] have been solved in other domains? List 3 analogies, explain the parallels, and extract applicable principles.'",
+                example: "Problem: User onboarding drop-off\n'Find analogies in:\n- Video games (tutorial levels)\n- Theme parks (queue design)\n- Restaurants (menu design)\nWhat principles transfer?'"
+            },
+            self_refine: {
+                framework: "Self-Refine",
+                title: "Self-Refine / Iterative Improvement",
+                description: "AI generates answer, critiques it, then improves it iteratively",
+                when: ["High-quality output needed", "Complex writing or analysis", "Catching errors and gaps", "Polishing drafts"],
+                avoid: ["Quick queries", "First-draft scenarios", "Cost-sensitive tasks"],
+                structure: "Prompt: 'Generate [output]. Then:\n1. Critique it (what's weak/missing?)\n2. Revise based on critique\n3. Repeat 2-3 times\nShow final version only (or show all iterations).'",
+                example: "'Write a product description. Then critique it for:\n- Clarity\n- Persuasiveness\n- Missing info\nRevise twice based on critiques.'"
+            },
+            perspectives: {
+                framework: "Multiple Perspectives",
+                title: "Multiple Perspectives / Devil's Advocate",
+                description: "Examine issue from multiple viewpoints, including contrarian ones",
+                when: ["Important decisions", "Avoiding blind spots", "Contentious topics", "Strategic planning"],
+                avoid: ["Simple factual queries", "When consensus is clear", "Routine decisions"],
+                structure: "Prompt: 'Analyze [issue] from:\n1. Proponent view\n2. Skeptic view\n3. Alternative view\n4. Synthesis\nSteel-man each position.'",
+                example: "'Should we migrate to microservices?\nView 1: Engineering lead (pro)\nView 2: CTO (risks)\nView 3: Product manager (user impact)\nSynthesize trade-offs'"
+            },
+            saga: {
+                framework: "SAGA",
+                title: "SAGA (Situation · Action · Goal · Audience)",
+                description: "Framework optimized for narrative and storytelling",
+                when: ["Creative writing", "Story development", "Narrative content", "Character-driven work"],
+                avoid: ["Technical documentation", "Analytical tasks", "Factual content"],
+                structure: "Situation: Setting and context\nAction: What happens/plot\nGoal: What characters want\nAudience: Reader expectations/genre",
+                example: "Situation: Post-apocalyptic Earth, 50 years after AI takeover\nAction: Underground human resistance discovers AI weakness\nGoal: Characters seek freedom vs safety\nAudience: YA readers, hopeful tone"
+            },
+            outline: {
+                framework: "Outline-First",
+                title: "Outline-First Approach",
+                description: "Build detailed outline, get approval, then flesh it out",
+                when: ["Long-form content", "Structured documents", "Collaborative writing", "Iterative development"],
+                avoid: ["Short content", "Stream-of-consciousness writing", "Tight deadlines"],
+                structure: "Step 1: 'Create detailed outline for [topic] with:\n- Main sections\n- Key points per section\n- Logical flow'\n\nStep 2: Review/revise outline\n\nStep 3: 'Flesh out section [X] of the outline'",
+                example: "'Create outline for \"Guide to Remote Team Management\"'\n→ Review outline\n→ 'Expand section 3: Communication Tools'\n→ Iterate section by section"
+            },
+            contrarian: {
+                framework: "Contrarian Thinking",
+                title: "Contrarian / Inversion Thinking",
+                description: "Challenge assumptions by inverting problems or playing devil's advocate",
+                when: ["Breaking conventional thinking", "Innovation needed", "Questioning status quo", "Risk identification"],
+                avoid: ["Need for consensus", "Straightforward problems", "Morale-sensitive situations"],
+                structure: "Prompt: 'What are the unquestioned assumptions about [topic]? Challenge each one. What if the opposite were true? What would have to change?'\n\nOr: 'Argue the most contrarian position on [issue] that could still be defensible.'",
+                example: "Topic: 'We need more meetings for alignment'\nContrarian: 'What if meetings make alignment worse? What if async updates work better? What assumptions underlie \"meeting culture\"?'"
+            },
+            iterate: {
+                framework: "Iterative Refinement",
+                title: "Iterative Refinement",
+                description: "Build incrementally with feedback loops at each stage",
+                when: ["Uncertain requirements", "Learning as you go", "Collaborative projects", "Rapid prototyping"],
+                avoid: ["Fixed requirements", "One-shot needs", "Time-critical tasks"],
+                structure: "Cycle:\n1. Generate small piece\n2. Evaluate/get feedback\n3. Adjust direction\n4. Repeat\n\nPrompt: 'Start with [small part]. After I review, we'll iterate based on feedback.'",
+                example: "'Design a logo. Start with 3 rough concepts. I'll pick one, then we'll refine colors, then typography, then final polish.' (vs. asking for final logo immediately)"
+            },
+            comparison: {
+                framework: "Comparison Matrix",
+                title: "Comparison Matrix / Decision Framework",
+                description: "Structured comparison of multiple options across key criteria",
+                when: ["Multiple alternatives exist", "Decision-making", "Product selection", "Vendor evaluation"],
+                avoid: ["Single option scenarios", "Open-ended exploration", "Creative tasks"],
+                structure: "Prompt: 'Compare [options] across these criteria:\n- [Criterion 1]\n- [Criterion 2]\n- [Criterion 3]\nProvide:\n1. Matrix/table\n2. Scoring (if applicable)\n3. Recommendation with rationale'",
+                example: "'Compare MongoDB, PostgreSQL, DynamoDB for our use case:\n- Scalability\n- Cost\n- Query flexibility\n- Learning curve\n- Ecosystem\nRate each 1-5, recommend best fit'"
+            },
+            research_deep: {
+                framework: "Deep Research",
+                title: "Deep Research Protocol",
+                description: "Systematic approach for comprehensive topic research",
+                when: ["Academic research", "Market analysis", "Due diligence", "Thorough understanding needed"],
+                avoid: ["Quick lookups", "Surface-level info", "Time pressure"],
+                structure: "Phase 1: Map the landscape\nPhase 2: Identify authoritative sources\nPhase 3: Synthesize key findings\nPhase 4: Identify gaps/questions\nPhase 5: Form conclusions\n\nPrompt: 'Research [topic] systematically: overview, key sources, main debates, gaps, synthesis.'",
+                example: "'Research state of AI in medical diagnosis:\n1. Current approaches\n2. Key papers/companies\n3. Accuracy vs human doctors\n4. Regulatory status\n5. Open questions\n6. 2-page synthesis'"
+            },
+            synthesis: {
+                framework: "Information Synthesis",
+                title: "Information Synthesis",
+                description: "Combine multiple sources into coherent unified understanding",
+                when: ["Complex information overload", "Multiple conflicting sources", "Creating summaries", "Knowledge integration"],
+                avoid: ["Single source", "Simple queries", "When detail matters more than overview"],
+                structure: "Prompt: 'Given these [N sources/perspectives], synthesize into:\n1. Common themes\n2. Key disagreements\n3. Your integrated understanding\n4. Confidence levels'",
+                example: "'I've provided 5 articles on remote work productivity. Synthesize:\n- What they agree on\n- Where they disagree\n- Most credible evidence\n- Practical takeaways'"
+            },
+            audience_adapt: {
+                framework: "Audience Adaptation",
+                title: "Audience Adaptation Ladder",
+                description: "Adjust explanation complexity based on audience knowledge level",
+                when: ["Diverse audience levels", "Educational content", "Technical communication", "Teaching progressively"],
+                avoid: ["Uniform audience", "Peer communication", "When depth matters more"],
+                structure: "Prompt: 'Explain [topic] at 3 levels:\n1. Beginner (no background)\n2. Intermediate (some exposure)\n3. Expert (deep knowledge)\n\nOr: \"Start simple, then layer complexity if I ask for more detail.\"'",
+                example: "'Explain blockchain:\n- For my grandmother\n- For a software developer\n- For a cryptographer\nSame concept, different depth/analogies'"
+            }
+        };
 
-  <div id="app" class="card"></div>
+        const allFrameworks = [
+            { id: 'rtf', name: 'RTF', category: 'Structure', complexity: 'Low' },
+            { id: 'aim', name: 'AIM', category: 'Structure', complexity: 'Medium' },
+            { id: 'risen', name: 'RISEN', category: 'Structure', complexity: 'High' },
+            { id: 'costar', name: 'COSTAR', category: 'Structure', complexity: 'High' },
+            { id: 'tot', name: 'Tree of Thoughts', category: 'Reasoning', complexity: 'Very High' },
+            { id: 'cot', name: 'Chain of Thought', category: 'Reasoning', complexity: 'Medium' },
+            { id: 'analogical', name: 'Analogical Reasoning', category: 'Reasoning', complexity: 'Medium' },
+            { id: 'decomposition', name: 'Problem Decomposition', category: 'Reasoning', complexity: 'Medium' },
+            { id: 'consistency', name: 'Self-Consistency', category: 'Verification', complexity: 'Medium' },
+            { id: 'self_refine', name: 'Self-Refine', category: 'Verification', complexity: 'Medium' },
+            { id: 'perspectives', name: 'Multiple Perspectives', category: 'Verification', complexity: 'Medium' },
+            { id: 'feynman', name: 'Feynman Technique', category: 'Teaching', complexity: 'Low' },
+            { id: 'socratic', name: 'Socratic Method', category: 'Teaching', complexity: 'Medium' },
+            { id: 'audience_adapt', name: 'Audience Adaptation', category: 'Teaching', complexity: 'Medium' },
+            { id: 'scamper', name: 'SCAMPER', category: 'Creative', complexity: 'Low' },
+            { id: 'contrarian', name: 'Contrarian Thinking', category: 'Creative', complexity: 'Medium' },
+            { id: 'iterate', name: 'Iterative Refinement', category: 'Creative', complexity: 'Low' },
+            { id: 'saga', name: 'SAGA', category: 'Content', complexity: 'Medium' },
+            { id: 'outline', name: 'Outline-First', category: 'Content', complexity: 'Low' },
+            { id: 'flipped', name: 'Flipped Interaction', category: 'Interaction', complexity: 'Low' },
+            { id: 'comparison', name: 'Comparison Matrix', category: 'Analysis', complexity: 'Low' },
+            { id: 'research_deep', name: 'Deep Research', category: 'Analysis', complexity: 'High' },
+            { id: 'synthesis', name: 'Information Synthesis', category: 'Analysis', complexity: 'Medium' }
+        ];
 
-  <div class="actions">
-    <button onclick="goBack()">← Back</button>
-    <button onclick="reset()">Start Over</button>
-  </div>
-</div>
+        const categoryColors = {
+            'Structure': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+            'Reasoning': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+            'Verification': 'bg-green-500/20 text-green-300 border-green-500/30',
+            'Teaching': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+            'Creative': 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+            'Content': 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+            'Interaction': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+            'Analysis': 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+        };
 
-<script>
-// =========================
-// FRAMEWORK DATA
-// =========================
-const decisions = {
-  start: {
-    question: "What's your primary goal?",
-    options: [
-      { text: "Quick information or repeatable task", next: "rtf" },
-      { text: "Content creation (writing, marketing, storytelling)", next: "tag" },
-      { text: "Complex analysis, strategy, or research", next: "dream" },
-      { text: "Structured workflow or role-based task", next: "race" },
-      { text: "Problem solving and measurement", next: "pact" },
-      { text: "Breaking down large problems", next: "solve" },
-      { text: "Learning or teaching concepts", next: "feynman" },
-      { text: "Creative ideation or brainstorming", next: "scamper" }
-    ]
-  },
+        let currentStep = 'start';
+        let path = [];
+        let showAllFrameworks = false;
 
-  rtf: {
-    framework: "R-T-F",
-    title: "Role · Task · Format",
-    description: "Ideal for tasks that require concise, repeatable output. Ensures AI knows exactly what role it is playing, the task at hand, and the format of the output.",
-    when: [
-      "Operational or repetitive work",
-      "Quickly generating content snippets",
-      "Tasks that need a specific output format",
-      "High-volume workflows where consistency matters"
-    ],
-    avoid: [
-      "Creative exploration",
-      "Strategic planning",
-      "Open-ended brainstorming tasks"
-    ],
-    structure: "Role: Specify AI's expertise or persona\nTask: Define the action or deliverable\nFormat: Specify output constraints (length, style, medium)",
-    tips: [
-      "Be as specific as possible about the role; e.g., 'Senior marketing copywriter', not just 'writer'.",
-      "Include format requirements such as word count, tone, or structure.",
-      "Works best for prompts where you want a structured, predictable result."
-    ],
-    example: "Role: Senior copywriter\nTask: Write a follow-up email for leads who downloaded an eBook\nFormat: 5 sentences, friendly and persuasive tone"
-  },
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = showAllFrameworks ? renderAllFrameworks() : renderDecisionTree();
+        }
 
-  tag: {
-    framework: "T-A-G",
-    title: "Task · Action · Goal",
-    description: "Focuses on clearly defining the task, the action needed, and the measurable goal to guide the AI's output.",
-    when: [
-      "Marketing campaigns and customer engagement",
-      "Operational process improvements",
-      "Small-to-medium strategic initiatives"
-    ],
-    avoid: [
-      "Highly creative or open-ended ideation",
-      "Philosophical discussions",
-      "Tasks with no measurable outcome"
-    ],
-    structure: "Task: Define the task to accomplish\nAction: Specify the action AI should take\nGoal: Define what success looks like (metrics or outcomes)",
-    tips: [
-      "Use measurable outcomes (e.g., % increase in conversion, number of leads).",
-      "Good for short, actionable prompts.",
-      "Helps AI focus on what needs to be done instead of general advice."
-    ],
-    example: "Task: Reduce churn for SaaS users\nAction: Analyze churn data, identify patterns, suggest retention campaigns\nGoal: Improve retention by 15% in 6 months"
-  },
+        function renderAllFrameworks() {
+            const categories = [...new Set(allFrameworks.map(f => f.category))];
+            
+            return `
+                <div class="min-h-screen p-8">
+                    <div class="max-w-6xl mx-auto">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 class="text-4xl font-bold text-white mb-2">All Frameworks Library</h1>
+                                <p class="text-purple-200">Browse all ${allFrameworks.length} prompting frameworks</p>
+                            </div>
+                            <button onclick="toggleView()" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                                Back to Decision Tree
+                            </button>
+                        </div>
+                        ${categories.map(category => {
+                            const frameworks = allFrameworks.filter(f => f.category === category);
+                            return `
+                                <div class="mb-8">
+                                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                        <span class="px-3 py-1 rounded-lg text-sm ${categoryColors[category]}">
+                                            ${category}
+                                        </span>
+                                        <span class="text-purple-300 text-lg">(${frameworks.length} frameworks)</span>
+                                    </h2>
+                                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        ${frameworks.map(fw => {
+                                            const details = decisions[fw.id];
+                                            return `
+                                                <button onclick="jumpToFramework('${fw.id}')" class="text-left p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 hover:border-purple-400 transition-all group">
+                                                    <div class="flex items-start justify-between mb-2">
+                                                        <h3 class="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
+                                                            ${fw.name}
+                                                        </h3>
+                                                        <svg class="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text-sm text-purple-200 mb-2">${details.title}</p>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="text-xs px-2 py-1 bg-white/10 rounded text-purple-300">
+                                                            ${fw.complexity}
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
 
-  dream: {
-    framework: "D-R-E-A-M",
-    title: "Define · Research · Execute · Analyze · Measure",
-    description: "Breaks down complex projects into clear, sequential steps, ensuring the AI considers the full workflow from problem definition to evaluation.",
-    when: [
-      "Product development planning",
-      "Research-heavy initiatives",
-      "Strategic projects that require stepwise execution"
-    ],
-    avoid: [
-      "Quick tasks or one-off questions",
-      "Very simple outputs or short answers"
-    ],
-    structure: "Define: Clarify problem/context\nResearch: Identify sources and gather info\nExecute: Plan and take action\nAnalyze: Review results and patterns\nMeasure: Track success metrics",
-    tips: [
-      "Useful for project managers, researchers, and analysts.",
-      "Helps generate step-by-step plans rather than single outputs.",
-      "Can be combined with other frameworks (like T-A-G) for clarity on goals."
-    ],
-    example: "Define: Low email engagement\nResearch: Analyze past campaigns, survey users\nExecute: Run 3 A/B test campaigns\nAnalyze: Compare engagement across variations\nMeasure: Track CTR and conversion rates"
-  },
+        function renderDecisionTree() {
+            const current = decisions[currentStep];
+            const isFramework = current.framework;
+            
+            return `
+                <div class="min-h-screen p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="text-center mb-8">
+                            <h1 class="text-4xl font-bold text-white mb-2">AI Prompting Framework Selector</h1>
+                            <p class="text-purple-200 mb-4">Answer questions to find your ideal framework from ${allFrameworks.length} options</p>
+                            <button onclick="toggleView()" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-purple-200 rounded-lg transition-colors border border-white/20">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                                Browse All Frameworks
+                            </button>
+                        </div>
 
-  care: {
-    framework: "C-A-R-E",
-    title: "Context · Action · Result · Evaluation",
-    description: "Designed for problem-solving with an emphasis on evaluating outcomes and learning from results.",
-    when: [
-      "Customer success initiatives",
-      "Process improvements",
-      "Project evaluations and reporting"
-    ],
-    avoid: [
-      "Purely creative writing",
-      "Tasks that don’t require evaluation"
-    ],
-    structure: "Context: Set the scene/background\nAction: Steps AI should take\nResult: Expected outcome\nEvaluation: Metrics or criteria for success",
-    tips: [
-      "Great for iterative processes where feedback is key.",
-      "Helps keep tasks structured and measurable.",
-      "Can be paired with analytics prompts for deeper insights."
-    ],
-    example: "Context: Customer complaints rising\nAction: Implement new support workflow\nResult: Reduce complaints by 20%\nEvaluation: Track NPS score and support ticket metrics"
-  },
+                        ${path.length > 0 ? `
+                            <div class="mb-6 flex items-center gap-2 text-sm text-purple-300 flex-wrap">
+                                ${path.map((step, i) => `
+                                    <span>${decisions[step].question.split('?')[0]}</span>
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                `).join('')}
+                                <span class="text-white font-medium">
+                                    ${isFramework ? current.framework : current.question.split('?')[0]}
+                                </span>
+                            </div>
+                        ` : ''}
 
-  solve: {
-    framework: "S-O-L-V-E",
-    title: "Situation · Objective · Limitations · Vision · Execution",
-    description: "Perfect for strategic planning or tackling large-scale problems while considering constraints and long-term goals.",
-    when: [
-      "High-level strategic planning",
-      "Complex problem-solving",
-      "Project management and execution planning"
-    ],
-    avoid: [
-      "Quick or one-off tasks",
-      "Tasks with no defined context or constraints"
-    ],
-    structure: "Situation: Current scenario or problem\nObjective: Desired outcome\nLimitations: Constraints and trade-offs\nVision: Long-term goal or ambition\nExecution: Steps to implement solution",
-    tips: [
-      "Useful for product managers, strategists, and leadership tasks.",
-      "Helps AI provide holistic, actionable plans.",
-      "Include clear constraints to avoid unrealistic suggestions."
-    ],
-    example: "Situation: Launching a SaaS in a competitive market\nObjective: Capture 10% market share\nLimitations: Budget of $50k\nVision: Become the leading eco-friendly platform\nExecution: Social campaigns, influencer partnerships, targeted ads"
-  },
+                        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
+                            ${!isFramework ? `
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white mb-6">${current.question}</h2>
+                                    <div class="space-y-3">
+                                        ${current.options.map((option, idx) => `
+                                            <button onclick="handleChoice('${option.next}')" class="w-full text-left p-4 bg-white/5 hover:bg-white/15 rounded-xl border border-white/10 hover:border-purple-400 transition-all duration-200 text-white font-medium flex items-center justify-between group">
+                                                <span>${option.text}</span>
+                                                <svg class="text-purple-400 group-hover:translate-x-1 transition-transform" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                </svg>
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : `
+                                <div>
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div>
+                                            <div class="text-purple-400 text-sm font-semibold mb-1">RECOMMENDED FRAMEWORK</div>
+                                            <h2 class="text-3xl font-bold text-white">${current.framework}</h2>
+                                            <p class="text-xl text-purple-200 mt-1">${current.title}</p>
+                                        </div>
+                                    </div>
 
-  race: {
-    framework: "R-A-C-E",
-    title: "Role · Action · Context · Expectation",
-    description: "Helps structure role-specific tasks by providing context and desired outcomes, ideal for workflow or operational guidance.",
-    when: [
-      "Role-specific tasks (e.g., marketing, sales, consulting)",
-      "Email or outreach campaigns",
-      "Structured multi-step workflows"
-    ],
-    avoid: [
-      "Abstract brainstorming",
-      "Purely creative, unconstrained tasks"
-    ],
-    structure: "Role: AI’s persona/expertise\nAction: What AI should do\nContext: Relevant background info\nExpectation: Desired output or deliverable",
-    tips: [
-      "Clear role definition improves relevance of AI output.",
-      "Provide enough context to avoid generic responses.",
-      "Use expectation to control the output style or detail level."
-    ],
-    example: "Role: Marketing consultant\nAction: Develop cold email strategy\nContext: Client sells workflow automation\nExpectation: Provide 3 fully written, personalized email templates"
-  },
+                                    <p class="text-white/90 text-lg mb-6 leading-relaxed">${current.description}</p>
 
-  pact: {
-    framework: "P-A-C-T",
-    title: "Problem · Approach · Compromise · Test",
-    description: "Structured for problem-solving with measurable results, testing ideas, and defining trade-offs.",
-    when: [
-      "Product management",
-      "Optimization tasks",
-      "A/B testing or experimental approaches"
-    ],
-    avoid: [
-      "Purely creative ideation",
-      "Tasks without measurable outcomes"
-    ],
-    structure: "Problem: Define challenge\nApproach: Plan to tackle it\nCompromise: Constraints or trade-offs\nTest: How success is measured",
-    tips: [
-      "Use for experimentation or process optimization.",
-      "Great for iterative testing and refinement.",
-      "Combine with metrics or KPIs to evaluate results."
-    ],
-    example: "Problem: Low trial-to-paid conversion\nApproach: Revamp onboarding process\nCompromise: Keep only key features for MVP\nTest: Measure increase in paid conversions over 30 days"
-  },
+                                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                                        <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                                            <h3 class="text-green-400 font-semibold mb-2 flex items-center gap-2">
+                                                ✓ Use When:
+                                            </h3>
+                                            <ul class="space-y-1 text-green-100 text-sm">
+                                                ${current.when.map(item => `<li>• ${item}</li>`).join('')}
+                                            </ul>
+                                        </div>
 
-  rise: {
-    framework: "R-I-S-E",
-    title: "Role · Input · Steps · Expectation",
-    description: "Focuses on stepwise guidance for tasks requiring clear inputs and procedural outputs.",
-    when: [
-      "Workflow guidance",
-      "Step-by-step operational tasks",
-      "Data-driven or instructional outputs"
-    ],
-    avoid: [
-      "Abstract ideation",
-      "High-level strategic planning only"
-    ],
-    structure: "Role: AI’s expertise\nInput: Data or material AI will use\nSteps: Specific actions AI should take\nExpectation: Desired output",
-    tips: [
-      "Excellent for structured procedural instructions.",
-      "Helps AI follow a workflow or checklist.",
-      "Combine with metrics to verify completion."
-    ],
-    example: "Role: Product manager\nInput: Customer feedback dataset\nSteps: Categorize feedback, prioritize issues, propose solutions\nExpectation: Actionable roadmap insights"
-  },
+                                        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                                            <h3 class="text-red-400 font-semibold mb-2 flex items-center gap-2">
+                                                ✗ Avoid When:
+                                            </h3>
+                                            <ul class="space-y-1 text-red-100 text-sm">
+                                                ${current.avoid.map(item => `<li>• ${item}</li>`).join('')}
+                                            </ul>
+                                        </div>
+                                    </div>
 
-  feynman: {
-    framework: "Feynman Technique",
-    title: "Explain by simplifying",
-    description: "Useful for teaching, learning, or simplifying complex concepts into digestible explanations.",
-    when: [
-      "Learning new concepts",
-      "Teaching others",
-      "Creating educational content"
-    ],
-    avoid: [
-      "Highly technical expert-to-expert communication",
-      "Tasks requiring exact numeric precision"
-    ],
-    structure: "Explain in simple terms → Avoid jargon → Use analogies → Build conceptual understanding",
-    tips: [
-      "Ask AI to imagine explaining to a 12-year-old for maximal simplicity.",
-      "Helps identify knowledge gaps.",
-      "Useful for making technical content accessible."
-    ],
-    example: "Explain LLMs to a curious 12-year-old using simple analogies like a library that learns from books"
-  },
+                                    <div class="bg-white/5 rounded-lg p-4 mb-4">
+                                        <h3 class="text-purple-300 font-semibold mb-2">Structure:</h3>
+                                        <pre class="text-white text-sm whitespace-pre-wrap font-mono">${current.structure}</pre>
+                                    </div>
 
-  scamper: {
-    framework: "SCAMPER",
-    title: "Structured Ideation",
-    description: "Systematic creative thinking method using substitution, combination, adaptation, modification, putting to other use, elimination, and reversal.",
-    when: [
-      "Product ideation",
-      "Brainstorming sessions",
-      "Creative problem-solving"
-    ],
-    avoid: [
-      "Purely operational tasks",
-      "Analytical problem-solving"
-    ],
-    structure: "Substitute, Combine, Adapt, Modify, Put to other use, Eliminate, Reverse",
-    tips: [
-      "Use SCAMPER to generate multiple creative options quickly.",
-      "Works well for both product design and process innovation.",
-      "Combine with R-T-F for output formatting if needed."
-    ],
-    example: "Redesign a coffee mug using SCAMPER: Substitute plastic with bamboo, Combine with storage lid, Adapt shape for better grip, Modify handle, Put to other use as pen holder, Eliminate waste, Reverse orientation"
-  }
-};
+                                    <div class="bg-white/5 rounded-lg p-4">
+                                        <h3 class="text-purple-300 font-semibold mb-2">Example:</h3>
+                                        <pre class="text-white text-sm whitespace-pre-wrap font-mono">${current.example}</pre>
+                                    </div>
+                                </div>
+                            `}
 
+                            <div class="flex gap-3 mt-6">
+                                ${path.length > 0 ? `
+                                    <button onclick="goBack()" class="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors border border-white/20">
+                                        ← Back
+                                    </button>
+                                ` : ''}
+                                <button onclick="reset()" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2 ml-auto">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Start Over
+                                </button>
+                            </div>
+                        </div>
 
-// =========================
-// RENDER LOGIC
-// =========================
-let history = [];
-let current = "start";
+                        <div class="mt-8 bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
+                            <h3 class="text-white font-semibold mb-3">Framework Categories (${allFrameworks.length} total)</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                ${Object.entries(
+                                    allFrameworks.reduce((acc, fw) => {
+                                        acc[fw.category] = (acc[fw.category] || 0) + 1;
+                                        return acc;
+                                    }, {})
+                                ).map(([category, count]) => `
+                                    <div class="px-3 py-2 rounded-lg ${categoryColors[category]}">
+                                        <span class="font-semibold">${category}</span>
+                                        <span class="ml-2">(${count})</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
-function render() {
-  const node = decisions[current];
-  const app = document.getElementById("app");
+        function handleChoice(next) {
+            path.push(currentStep);
+            currentStep = next;
+            render();
+        }
 
-if (!node.framework) {
-  app.innerHTML = `
-    <h2>${node.question}</h2>
-    <div class="space-y-3">
-      ${node.options.map(o => `
-        <button onclick="choose('${o.next}')">
-          ${o.text}
-        </button>
-      `).join("")}
-    </div>
-  `;
-  } else {
-    app.innerHTML = `
-      <h2>${node.framework}</h2>
-      <p>${node.title}</p>
-      <p>${node.description}</p>
+        function reset() {
+            currentStep = 'start';
+            path = [];
+            showAllFrameworks = false;
+            render();
+        }
 
-      <h3>Use When</h3>
-      ${node.when.map(w => `<span class="pill">${w}</span>`).join("")}
+        function goBack() {
+            if (path.length > 0) {
+                currentStep = path.pop();
+                render();
+            }
+        }
 
-      <h3>Avoid When</h3>
-      ${node.avoid.map(a => `<span class="pill">${a}</span>`).join("")}
+        function toggleView() {
+            showAllFrameworks = !showAllFrameworks;
+            render();
+        }
 
-      <h3>Structure</h3>
-      <pre>${node.structure}</pre>
+        function jumpToFramework(id) {
+            path = [];
+            currentStep = id;
+            showAllFrameworks = false;
+            render();
+        }
 
-      <h3>Example</h3>
-      <pre>${node.example}</pre>
-    `;
-  }
-}
-
-// =========================
-// NAVIGATION
-// =========================
-function choose(next) { history.push(current); current = next; render(); }
-function goBack() { if(history.length){ current = history.pop(); render(); } }
-function reset() { history=[]; current="start"; render(); }
-
-render();
-</script>
-
+        // Initial render
+        render();
+    </script>
 </body>
 </html>
